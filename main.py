@@ -4,7 +4,11 @@ import psycopg2
 def get_phone_id(cursor, phone):
     cursor.execute("""
         select id from phone where phone=%s;""", (phone,))
-    return cur.fetchone()[0]
+    data = cur.fetchone()
+    if data == None:
+        print('номер телефона не найден')
+    else:
+        return data[0]
 
 
 def client_phone_id(cursor, phone_id):
@@ -108,10 +112,11 @@ def change_client_phone():
     new_phone = input('Введите новый номер телефона')
     client_id = get_email_id(cur, email)
     phone_id = client_phone_id(cur, client_id)
-    cur.execute(f"""update phone
-        SET phone = %s
-        where id = %s and phone = %s;""", (new_phone, phone_id, old_phone,))
-    cur.execute(f"""select phone from phone;""")
+    if phone_id != None:
+        cur.execute(f"""update phone
+            SET phone = %s
+            where id = %s and phone = %s;""", (new_phone, phone_id, old_phone,))
+        cur.execute(f"""select phone from phone;""")
     print(cur.fetchall())
 
 
@@ -120,12 +125,13 @@ def delete_phone():
     client_id = get_email_id(cur, email)
     phone_number = input('Введите номер телефона, который хотите удалить')
     phone_id = get_phone_id(cur, phone_number)
-    cur.execute(f"""delete from clients_phone
-    where phone_id = %s and client_id = %s;""", (phone_id, client_id))
-    cur.execute(f"""delete from phone
-        where id = %s;""", (phone_id,))
-    cur.execute(f"""select phone from phone;""")
-    print(cur.fetchall())
+    if phone_id != None:
+        cur.execute(f"""delete from clients_phone
+        where phone_id = %s and client_id = %s;""", (phone_id, client_id))
+        cur.execute(f"""delete from phone
+            where id = %s;""", (phone_id,))
+        cur.execute(f"""select phone from phone;""")
+        print(cur.fetchall())
 
 
 def delete_client():
@@ -143,7 +149,10 @@ def search_name():
                 join clients_phone on clients_phone.client_id = clients.id
                 join phone on phone.id = clients_phone.phone_id
                 where name = %s""", (name,))
-    print(cur.fetchall())
+    if cur.fetchall() == []:
+        print('Клиент не найден')
+    else:
+        print(cur.fetchall())
 
 
 def search_surname():
@@ -152,7 +161,11 @@ def search_surname():
                 join clients_phone on clients_phone.client_id = clients.id
                 join phone on phone.id = clients_phone.phone_id
                 where surname = %s""", (surname,))
-    print(cur.fetchall())
+    if cur.fetchall() == []:
+        print('Клиент не найден')
+    else:
+        print(cur.fetchall())
+
 
 
 def search_email():
@@ -161,7 +174,10 @@ def search_email():
                 join clients_phone on clients_phone.client_id = clients.id
                 join phone on phone.id = clients_phone.phone_id
                 where email = %s""", (email,))
-    print(cur.fetchall())
+    if cur.fetchall() == []:
+        print('Клиент не найден')
+    else:
+        print(cur.fetchall())
 
 
 def search_phone():
@@ -170,8 +186,10 @@ def search_phone():
                 join clients_phone on clients_phone.client_id = clients.id
                 join phone on phone.id = clients_phone.phone_id
                 where phone = %s""", (phone,))
-    count = cur.execute(f"""select count()""")
-    print(cur.fetchall())
+    if cur.fetchall() == []:
+        print('Клиент не найден')
+    else:
+        print(cur.fetchall())
 
 
 def choose_what_to_change():
