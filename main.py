@@ -228,6 +228,8 @@ def find_client():
             search_email()
         elif c == 'phone':
             search_phone()
+        elif c == 'q':
+            break
 
 
 with psycopg2.connect(database="romario", user="postgres", password="Roma2003") as conn:
